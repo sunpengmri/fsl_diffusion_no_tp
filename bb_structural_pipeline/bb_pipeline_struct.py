@@ -25,8 +25,43 @@ import os
 import numpy as np
 import bb_pipeline_tools.bb_logging_tool as LT
 import time
+import sys,argparse,os.path
 
-def bb_pipeline_struct(subject, runTopup, fileConfiguration):
+class MyParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.stderr.write('error: %s\n' % message)
+        self.print_help()
+        sys.exit(2)
+
+class Usage(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+# def bb_pipeline_struct(subject, runTopup, fileConfiguration):
+def bb_pipeline_struct():
+    
+    parser = MyParser(description='UK Biobank tool to get a B0 of a set of B0 images')
+    parser.add_argument('-s', dest='subject', type=str, nargs=1, help='subject name')
+    parser.add_argument('-t', dest='ifTopup', type=bool, default=[False],nargs=1, help='if Topup')
+    parser.add_argument('-f', dest='fileConfig',type=str, default=['T1'], nargs=1,help='fileConfig')
+
+    argsa = parser.parse_args()
+    
+    if (argsa.subject==None):
+        parser.print_help()
+        exit()
+    
+    if (argsa.ifTopup==None):
+        parser.print_help()
+        exit()
+
+    if (argsa.fileConfig==None):
+        parser.print_help()
+        exit()
+    
+    subject=argsa.subject[0]
+    runTopup=argsa.ifTopup[0]
+    fileConfiguration=argsa.fileConfig[0]
 
     logger  = LT.initLogging(__file__, subject)
     logDir  = logger.logDir
@@ -102,9 +137,11 @@ def bb_pipeline_struct(subject, runTopup, fileConfiguration):
                     + ' $BB_BIN_DIR/bb_structural_pipeline/bb_post_topup ' + subject )
             return jobPOSTTOPUP
 
+if __name__ == "__main__":
+    bb_pipeline_struct()
 
 
-subject='con001'
-runTopup= False
-fileConfiguration='T1'
-bb_pipeline_struct(subject, runTopup, fileConfiguration)
+# subject='con001'
+# runTopup= False
+# fileConfiguration='T1'
+# bb_pipeline_struct(subject, runTopup, fileConfiguration)

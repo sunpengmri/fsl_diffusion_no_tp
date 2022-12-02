@@ -23,9 +23,43 @@
 #
 
 import bb_pipeline_tools.bb_logging_tool as LT
-import os.path
+import sys,argparse,os.path
 
-def bb_pipeline_diff(subject, jobHold, fileConfiguration):
+class MyParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.stderr.write('error: %s\n' % message)
+        self.print_help()
+        sys.exit(2)
+
+class Usage(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+# def bb_pipeline_diff(subject, jobHold, fileConfiguration):
+def bb_pipeline_diff():
+
+    parser = MyParser(description='UK Biobank tool to get a B0 of a set of B0 images')
+    parser.add_argument('-s', dest='subject', type=str, nargs=1, help='subject name')
+    parser.add_argument('-t', dest='jobHold', type=str, default=['-1'],nargs=1, help='jobHold')
+    parser.add_argument('-f', dest='fileConfig',type=str, default=[''], nargs=1,help='fileConfig')
+
+    argsa = parser.parse_args()
+    
+    if (argsa.subject==None):
+        parser.print_help()
+        exit()
+    
+    if (argsa.jobHold==None):
+        parser.print_help()
+        exit()
+
+    if (argsa.fileConfig==None):
+        parser.print_help()
+        exit()
+    
+    subject=argsa.subject[0]
+    jobHold=argsa.jobHold[0]
+    fileConfiguration=argsa.fileConfig[0]
 
     logger = LT.initLogging(__file__, subject)
     logDir  = logger.logDir
@@ -40,8 +74,14 @@ def bb_pipeline_diff(subject, jobHold, fileConfiguration):
     jobPOSTBEDPOSTX = LT.runCommand(logger, '${FSLDIR}/bin/fsl_sub -T 15  -N "bb_post_bedpostx_gpu_'   + subject + '" -j ' + jobBEDPOSTX    + '  -l ' + logDir + ' $BB_BIN_DIR/bb_diffusion_pipeline/bb_bedpostx/bb_post_bedpostx_gpu ' + baseDir + '/dMRI/dMRI')
     jobXTRACT =      LT.runCommand(logger, '$BB_BIN_DIR/bb_diffusion_pipeline/bb_xtract/bb_xtract_gpu ' + baseDir + '/dMRI/dMRI' + ' ' + jobPOSTBEDPOSTX)
     return jobXTRACT,
-subject='con001'
-jobHold= '-1'
-fileConfiguration=''
-bb_pipeline_diff(subject, jobHold, fileConfiguration)
+
+if __name__ == "__main__":
+    bb_pipeline_diff()
+
+
+
+# subject='con001'
+# jobHold= '-1'
+# fileConfiguration=''
+# bb_pipeline_diff(subject, jobHold, fileConfiguration)
 
