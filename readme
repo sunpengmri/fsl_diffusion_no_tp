@@ -1,0 +1,4 @@
+1. set dir in dcm2nii.sh
+2. cd data dir
+3. python bb_pipeline_struct.py
+4. python bb_pipeline_diff.py

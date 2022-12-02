@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+#
+# Script name: bb_eddy_no_topup
+# not ensure the results,just for test, and topup is mandary
+# Description: Script to run eddy_cuda with the appropriate parameters.
+#
+# Authors: revised by Peng.Sun
+
+. $BB_BIN_DIR/bb_pipeline_tools/bb_set_header 
+
+direc=$PWD/$1
+cd ${direc}
+mkdir -p dMRI/dMRI/
+# Prepare data for eddy, dtifit and bedpostx.
+cp dMRI/raw/AP.nii.gz dMRI/dMRI/AP.nii.gz
+cp dMRI/raw/AP.bval dMRI/dMRI/bvals
+cp dMRI/raw/AP.bvec dMRI/dMRI/bvecs
+
+# get b0 volumns
+python ${BBPSTUCPATH}/bb_get_b0s.py -i dMRI/dMRI/AP.nii.gz -o dMRI/dMRI/nodif.nii.gz -n 1 -l 100 -a dMRI/dMRI/bvals
+# python ${BBPSTUCPATH}/bb_choose_bestB0 dMRI/dMRI/total_B0_AP.nii.gz dMRI/dMRI/B0_AP.nii.gz
+
+$BB_BIN_DIR/bb_structural_pipeline/bb_epi_reg --epi=dMRI/dMRI/nodif.nii.gz \
+ --t1=T1/T1.nii.gz \
+ --t1brain=T1/T1_brain.nii.gz \
+ --out=dMRI/dMRI/nodif_to_T1 \
+ --wmseg=T1/T1_fast/T1_brain_WM_mask.nii.gz
+
+# Generate a mask for eddy  by inverting the previous registration and applying it to T1 brain mask
+${FSLDIR}/bin/convert_xfm -omat dMRI/dMRI/T1_to_nodif.mat \
+-inverse dMRI/dMRI/nodif_to_T1.mat
+${FSLDIR}/bin/fslmaths T1/T1_brain_mask.nii.gz -thr 0.1 -kernel sphere 1.1 \
+-dilF -bin -fillh T1/T1_brain_mask_dil.nii.gz
+${FSLDIR}/bin/flirt -in T1/T1_brain_mask_dil.nii.gz -ref dMRI/dMRI/nodif.nii.gz \
+-applyxfm -init dMRI/dMRI/T1_to_nodif.mat -out dMRI/dMRI/nodif_brain_mask.nii.gz -interp trilinear
+${FSLDIR}/bin/fslmaths dMRI/dMRI/nodif_brain_mask.nii.gz -thr 0.25 -bin -fillh dMRI/dMRI/nodif_brain_mask.nii.gz
+
+
+
+# bestInd=`cat $baseDir/fieldmap/total_B0_AP_best_index.txt`
+# $FSLDIR/bin/eddy --imain=$baseDir/dMRI/dMRI/AP.nii.gz --mask=$baseDir/dMRI/dMRI/nodif_brain_mask.nii.gz \
+# --topup=$baseDir/fieldmap/fieldmap_out --acqp=$baseDir/fieldmap/acqparams.txt \
+# --index=$baseDir/dMRI/dMRI/eddy_index.txt --bvecs=$baseDir/dMRI/dMRI/bvecs --bvals=$baseDir/dMRI/dMRI/bvals \
+#  --out=$baseDir/dMRI/dMRI/data --ref_scan_no=$bestInd --flm=quadratic --resamp=jac \
+#  --slm=linear --fwhm=2 --ff=5  --sep_offs_move --nvoxhp=1000 --very_verbose  --repol --rms
+
+
+# Creation of acqparam file
+numAP=1
+numlines=`${FSLDIR}/bin/fslval dMRI/raw/AP.nii.gz dim2`
+dtiDwell=`$BB_BIN_DIR/bb_pipeline_tools/bb_get_dwell_time dMRI/raw/AP.nii.gz`
+topupValue="0"`echo "scale=4;("$dtiDwell" * ("$numlines" -1.0)) / 1000.0 "| bc`
+cat /dev/null > dMRI/dMRI//acqparams.txt 
+
+for i in `seq 1 $numAP`;
+do
+    printf "0 -1 0 $topupValue\n" >>dMRI/dMRI/acqparams.txt
+done   
+
+indx=""
+n=`${FSLDIR}/bin/fslval dMRI/raw/AP.nii.gz dim4`
+for ((i=1;i<=${n};i++));do
+    indx="$indx 1"
+done
+echo $indx > dMRI/dMRI/eddy_index.txt
+
+bestInd=1
+$FSLDIR/bin/eddy_cuda9.1 --imain=dMRI/dMRI/AP.nii.gz --mask=dMRI/dMRI/nodif_brain_mask \
+--acqp=dMRI/dMRI/acqparams.txt \
+--index=dMRI/dMRI/eddy_index.txt --bvecs=dMRI/dMRI/bvecs --bvals=dMRI/dMRI/bvals \
+--out=dMRI/dMRI/data --ref_scan_no=$bestInd --flm=quadratic --resamp=jac \
+--slm=linear --fwhm=2 --ff=5  --sep_offs_move --nvoxhp=1000 --very_verbose \
+--data_is_shelled --repol --rms
+
+$BB_BIN_DIR/bb_diffusion_pipeline/bb_select_dwi_vols_v2 \
+dMRI/dMRI/data.nii.gz \
+dMRI/dMRI/bvals \
+dMRI/dMRI/data_1_shell 1000 1 \
+dMRI/dMRI/bvecs
+
+. $BB_BIN_DIR/bb_pipeline_tools/bb_set_footer 
