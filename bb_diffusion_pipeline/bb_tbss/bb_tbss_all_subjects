@@ -5,28 +5,16 @@
 # Description: General script to run the different phases of TBSS
 #
 # Authors: Fidel Alfaro-Almagro, Stephen M. Smith & Mark Jenkinson
-#
-# Copyright 2017 University of Oxford
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# revised by Peng Sun
+# should be called in the working directory, e.g. the subdir is subject dir
 #
 
 . "$BB_BIN_DIR"/bb_pipeline_tools/bb_set_header 
-sublist="con001"
 
+sublist="con001"
 direc="$PWD"
 cd $direc
-TBSSDir="$direc"/TBSS
+TBSSDir="$direc"/../TBSS
 mkdir "$TBSSDir"
 
 for sub in ${sublist};  
@@ -43,13 +31,13 @@ randomise -i all_FA_skeletonised -o tbss -m mean_FA_skeleton_mask -d tbss.mat \
 -t tbss.con -n 1000 --T2
 
 # show results
-fslview $FSLDIR/data/standard/MNI152_T1_1mm mean_FA_skeleton \
--cm Green -dr 0.2,0.7 tbss_tfce_corrp_tstat1 -cm Red-Yellow -dr 0.95,1 \
-tbss_tfce_corrp_tstat2 -cm Blue-Lightblue -dr 0.95,1 
+# fslview $FSLDIR/data/standard/MNI152_T1_1mm mean_FA_skeleton \
+# -cm Green -dr 0.2,0.7 tbss_tfce_corrp_tstat1 -cm Red-Yellow -dr 0.95,1 \
+# tbss_tfce_corrp_tstat2 -cm Blue-Lightblue -dr 0.95,1 
 
 # thickens the threshold stats image
-tbss_fill tbss_tfce_corrp_tstat1 0.95 mean_FA tbss_fill95
-fslview mean_FA -dr 0 0.6 mean_FA_skeleton -cm Green -dr 0.2,0.7 \
-tbss_fill95 -cm  Red-Yellow
+# tbss_fill tbss_tfce_corrp_tstat1 0.95 mean_FA tbss_fill95
+# fslview mean_FA -dr 0 0.6 mean_FA_skeleton -cm Green -dr 0.2,0.7 \
+# tbss_fill95 -cm  Red-Yellow
 
 . "$BB_BIN_DIR"/bb_pipeline_tools/bb_set_footer 
