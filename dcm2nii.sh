@@ -1,13 +1,10 @@
 #!/usr/bin/bash
 
 WorkingDir=/media/peng/data/02_MriDataSet/99_demo/15_ukbiobank/wang/test
+sublist=($(ls $WorkingDir))
 sublist="con003"
-# echo 'ls -l'
-# sublist= echo 'ls /home/peng/Documents/00_github/01_mri/03_freesurfer/T1Raw'
 
-
-
-for sub in ${sublist};  
+for sub in ${sublist[@]};  
 do   
 # 1. raw data tranformation
     cd ${WorkingDir}/${sub}

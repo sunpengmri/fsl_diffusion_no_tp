@@ -17,7 +17,8 @@ do
 done  
 cd $RawDir/temp
 ls *.nii | parallel --jobs 8 recon-all -s {.} -i {} -all -qcache
-rm -R $RawDir/temp
+cd ..
+rm -R temp/
 
 
 
