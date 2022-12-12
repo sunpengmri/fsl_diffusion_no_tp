@@ -15,6 +15,8 @@ direc="$PWD"
 cd $direc
 TBSSDir="$direc"/../TBSS
 mkdir "$TBSSDir"
+metrics="MD"
+
 
 WorkingDir=$direc
 sublist=($(ls $WorkingDir))
@@ -48,7 +50,6 @@ randomise -i all_FA_skeletonised -o FA_tbss -m mean_FA_skeleton_mask -d tbss.mat
 
 cd "$TBSSDir"
 
-metrics="MD"
 for para in ${metrics}
 do
     mkdir ${para}
@@ -63,8 +64,8 @@ do
     tbss_non_FA ${para}
 
     cd "$TBSSDir"
-    design_ttest2 tbss 3 3
     cd stats
+    design_ttest2 tbss 3 3
     randomise -i all_${para}_skeletonised -o ${para}_tbss -m mean_FA_skeleton_mask -d tbss.mat \
     -t tbss.con -n 5000 --T2
 

@@ -24,14 +24,20 @@
 
 subjdir=`fsl_abspath $1`
 subjdir=`echo $subjdir | sed 's/\/$/$/g'`
+meas=vol,prob,length,FA,MD,L1
+if [ ! -d  ${subjdir}.xtract ]; then
+    xtract -bpx ${subjdir}.bedpostX -out  ${subjdir}.xtract -species HUMAN \
+    -stdwarp ${subjdir}/../TBSS/FA/MNI_to_dti_FA_warp.nii.gz \
+    ${subjdir}/../TBSS/FA/dti_FA_to_MNI_warp.nii.gz -gpu \
+    -ptx_options $BB_BIN_DIR/bb_data/ptx.txt
+fi
 
-xtract -bpx ${subjdir}.bedpostX -out  ${subjdir}.xtract -species HUMAN \
--stdwarp ${subjdir}/../TBSS/FA/MNI_to_dti_FA_warp.nii.gz \
-${subjdir}/../TBSS/FA/dti_FA_to_MNI_warp.nii.gz -gpu \
--ptx_options $BB_BIN_DIR/bb_data/ptx.txt
-
-xtract_stats -d ${subjdir}/dti_ -xtract ${subjdir}.xtract \
--w ${subjdir}/../TBSS/FA/MNI_to_dti_FA_warp.nii.gz \
--r ${subjdir}/dti_FA.nii.gz
-
+# for para in ${meas};
+# do
+#     cp -R ${subjdir}.xtract ${subjdir}.${para}.xtract
+    xtract_stats -d ${subjdir}/dti_ -xtract ${subjdir}.xtract \
+    -w ${subjdir}/../TBSS/FA/MNI_to_dti_FA_warp.nii.gz \
+    -meas $meas \
+    -r ${subjdir}/dti_FA.nii.gz
+# done
 . $BB_BIN_DIR/bb_pipeline_tools/bb_set_footer
