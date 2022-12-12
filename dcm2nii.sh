@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 WorkingDir=/media/peng/data/02_MriDataSet/99_demo/15_ukbiobank/wang/test
 sublist=($(ls $WorkingDir))
-sublist="pat001 pat002 pat003"
+sublist="con001"
 
 # for sub in ${sublist[@]};
 for sub in ${sublist};

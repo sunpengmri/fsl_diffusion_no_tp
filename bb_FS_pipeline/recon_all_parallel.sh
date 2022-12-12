@@ -3,10 +3,10 @@
 
 WorkDir=/media/peng/data/02_MriDataSet/99_demo/15_ukbiobank/wang
 RawDir=$WorkDir/test
-export SUBJECTS_DIR=$WorkDir/FS
+export SUBJECTS_DIR=$WorkDir/FS3
 # mkdir -p $SUBJECTS_DIR
 
-sublist="con002 con003"
+sublist="con001"
 cd $RawDir
 mkdir temp
 cd temp
