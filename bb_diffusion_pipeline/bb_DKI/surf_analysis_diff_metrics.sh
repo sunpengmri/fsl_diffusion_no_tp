@@ -4,7 +4,7 @@
 WorkDir=/media/peng/data/02_MriDataSet/99_demo/15_ukbiobank/wang
 RawDir=$WorkDir/test
 export SUBJECTS_DIR=$WorkDir/FS
-
+# 1. projection the DSI metrics to FS space 
 sublist="con002"
 sublist=($(ls $RawDir))
 meas="MD"
@@ -19,6 +19,28 @@ do
         bbregister --s ${sub} --mov ${RawDir}/${sub}/dMRI/dMRI/data.nii.gz --dti --reg diff2t1.dat \
         --o diff2t1.nii.gz --fslmat diff2t1.mat --frame 0
     fi
+    # AlignAnat2Diff
+    atlases="wmparc aparc+aseg aparc.a2009s+aseg"
+    if [ ! -d  $RawDir/${sub}/dMRI/surf_stats ]; then
+        mkdir $RawDir/${sub}/dMRI/surf_stats
+    fi
+    
+    for temp in ${atlases}
+    do
+        mri_vol2vol --mov ${RawDir}/${sub}/dMRI/dMRI/data.nii.gz \
+        --targ  $SUBJECTS_DIR/${sub}/mri/${temp}.mgz --inv --interp nearest \
+        --o ${RawDir}/${sub}/dMRI/dMRI/${temp}_diff.mgz \
+        --reg ${RawDir}/${sub}/dMRI/dMRI/diff2t1.dat \
+        --no-save-reg
+        for para in ${meas}
+        do
+            mri_segstats \
+                --seg ${RawDir}/${sub}/dMRI/dMRI/${temp}_diff.mgz \
+                --ctab $FREESURFER_HOME/FreeSurferColorLUT.txt \
+                --i ${RawDir}/${sub}/dMRI/dMRI/dti_${para}.nii.gz \
+                --sum $RawDir/${sub}/dMRI/surf_stats/${para}_${temp}.stats
+        done        
+    done
 
     for para in ${meas}
     do
@@ -59,33 +81,4 @@ do
             done
         done
     done
-done  
-
-# mris_preproc --fsgd MD.fsgd/md.fsgd \
-#     --cache-in mean.MD.fsaverage \
-#     --target fsaverage \
-#     --hemi lh \
-#     --out lh.total.mgh
-
-
-# cd $SUBJECTS_DIR 
-# metrics="FA MD"
-# for para in ${metrics}
-# do
-#     mri_vol2surf --mov 
-
-    
-#     mris_preproc --target fsaverage --hemi lh \
-#     --iv  $RawDir/con002/dMRI/dMRI/dti_${para}.nii.gz $RawDir/con002/dMRI/dMRI/diff2t1.dat \
-#     --projfrac 0.5 \
-#     --out lh.dti_${para}.mgh
-# done
-
-
-
-
-# freeview -v $SUBJECTS_DIR/fbirn-anat-101.v6/mri/orig.mgz:visible=0 \
-#     fbirn-101/template.nii:reg=fbirn-101/register.lta -f \
-#     $SUBJECTS_DIR/fbirn-anat-101.v6/surf/lh.white \
-#     $SUBJECTS_DIR/fbirn-anat-101.v6/surf/rh.white \
-#     -viewport cor
+done
