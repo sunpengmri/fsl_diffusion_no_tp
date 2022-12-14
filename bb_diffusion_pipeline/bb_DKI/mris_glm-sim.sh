@@ -21,9 +21,9 @@ do
         do
             mri_glmfit-sim \
             --glmdir $FsStatsDir/$hemi.$para.$smooth.glmdir \
-            --perm 1000 3.0 pos \
+            --perm 100 1.0 pos \
             # --a2009s \
-            --cwp 0.05  \
+            --cwp 0.35  \
             --2spaces
         done
     done

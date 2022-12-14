@@ -44,44 +44,45 @@ do
             done        
         done
     fi
-
-    for para in ${meas}
-    do
-        for hemi in ${hemis}
+    if [ ! -d  $SUBJECTS_DIR/${sub}/surf/lh.5.mean.OD.fsaverage.mgh ]; then
+        for para in ${meas}
         do
-            for smooth in ${smoothing}
+            for hemi in ${hemis}
             do
-                mri_vol2surf --mov $RawDir/$sub/dMRI/dMRI/dti_${para}.nii.gz \
-                --ref $SUBJECTS_DIR/${sub}/mri/orig.mgz \
-                --reg $RawDir/${sub}/dMRI/dMRI/diff2t1.dat \
-                --fwhm 0 --surf-fwhm ${smooth} --hemi ${hemi} --trgsubject fsaverage --projfrac 0.25 \
-                --o $SUBJECTS_DIR/${sub}/surf/${hemi}.25.${para}.fsaverage.mgh
+                for smooth in ${smoothing}
+                do
+                    mri_vol2surf --mov $RawDir/$sub/dMRI/dMRI/dti_${para}.nii.gz \
+                    --ref $SUBJECTS_DIR/${sub}/mri/orig.mgz \
+                    --reg $RawDir/${sub}/dMRI/dMRI/diff2t1.dat \
+                    --fwhm 0 --surf-fwhm ${smooth} --hemi ${hemi} --trgsubject fsaverage --projfrac 0.25 \
+                    --o $SUBJECTS_DIR/${sub}/surf/${hemi}.25.${para}.fsaverage.mgh
 
-                mri_vol2surf --mov $RawDir/$sub/dMRI/dMRI/dti_${para}.nii.gz \
-                --ref $SUBJECTS_DIR/${sub}/mri/orig.mgz \
-                --reg $RawDir/${sub}/dMRI/dMRI/diff2t1.dat \
-                --fwhm 0 --surf-fwhm ${smooth} --hemi ${hemi} --trgsubject fsaverage --projfrac 0.5 \
-                --o $SUBJECTS_DIR/${sub}/surf/${hemi}.50.${para}.fsaverage.mgh
+                    mri_vol2surf --mov $RawDir/$sub/dMRI/dMRI/dti_${para}.nii.gz \
+                    --ref $SUBJECTS_DIR/${sub}/mri/orig.mgz \
+                    --reg $RawDir/${sub}/dMRI/dMRI/diff2t1.dat \
+                    --fwhm 0 --surf-fwhm ${smooth} --hemi ${hemi} --trgsubject fsaverage --projfrac 0.5 \
+                    --o $SUBJECTS_DIR/${sub}/surf/${hemi}.50.${para}.fsaverage.mgh
 
-                mri_vol2surf --mov $RawDir/$sub/dMRI/dMRI/dti_${para}.nii.gz \
-                --ref $SUBJECTS_DIR/${sub}/mri/orig.mgz \
-                --reg $RawDir/${sub}/dMRI/dMRI/diff2t1.dat \
-                --fwhm 0 --surf-fwhm ${smooth} --hemi ${hemi} --trgsubject fsaverage --projfrac 0.75 \
-                --o $SUBJECTS_DIR/${sub}/surf/${hemi}.75.${para}.fsaverage.mgh
+                    mri_vol2surf --mov $RawDir/$sub/dMRI/dMRI/dti_${para}.nii.gz \
+                    --ref $SUBJECTS_DIR/${sub}/mri/orig.mgz \
+                    --reg $RawDir/${sub}/dMRI/dMRI/diff2t1.dat \
+                    --fwhm 0 --surf-fwhm ${smooth} --hemi ${hemi} --trgsubject fsaverage --projfrac 0.75 \
+                    --o $SUBJECTS_DIR/${sub}/surf/${hemi}.75.${para}.fsaverage.mgh
 
-                mris_calc --output $SUBJECTS_DIR/${sub}/surf/${hemi}.temp.${para}.fsaverage.mgh \
-                $SUBJECTS_DIR/${sub}/surf/${hemi}.25.${para}.fsaverage.mgh add \
-                $SUBJECTS_DIR/${sub}/surf/${hemi}.50.${para}.fsaverage.mgh 
-                
-                mris_calc --output $SUBJECTS_DIR/${sub}/surf/${hemi}.temp1.${para}.fsaverage.mgh \
-                $SUBJECTS_DIR/${sub}/surf/${hemi}.temp.${para}.fsaverage.mgh add \
-                $SUBJECTS_DIR/${sub}/surf/${hemi}.75.${para}.fsaverage.mgh 
-                
-                mris_calc --output $SUBJECTS_DIR/${sub}/surf/${hemi}.${smooth}.mean.${para}.fsaverage.mgh \
-                $SUBJECTS_DIR/${sub}/surf/${hemi}.temp1.${para}.fsaverage.mgh div 3
-                cd $SUBJECTS_DIR/${sub}/surf
-                rm ${hemi}.temp.* ${hemi}.25.${para}.* ${hemi}.50.${para}.* ${hemi}.75.${para}.* ${hemi}.temp1.${para}.*
+                    mris_calc --output $SUBJECTS_DIR/${sub}/surf/${hemi}.temp.${para}.fsaverage.mgh \
+                    $SUBJECTS_DIR/${sub}/surf/${hemi}.25.${para}.fsaverage.mgh add \
+                    $SUBJECTS_DIR/${sub}/surf/${hemi}.50.${para}.fsaverage.mgh 
+                    
+                    mris_calc --output $SUBJECTS_DIR/${sub}/surf/${hemi}.temp1.${para}.fsaverage.mgh \
+                    $SUBJECTS_DIR/${sub}/surf/${hemi}.temp.${para}.fsaverage.mgh add \
+                    $SUBJECTS_DIR/${sub}/surf/${hemi}.75.${para}.fsaverage.mgh 
+                    
+                    mris_calc --output $SUBJECTS_DIR/${sub}/surf/${hemi}.${smooth}.mean.${para}.fsaverage.mgh \
+                    $SUBJECTS_DIR/${sub}/surf/${hemi}.temp1.${para}.fsaverage.mgh div 3
+                    cd $SUBJECTS_DIR/${sub}/surf
+                    rm ${hemi}.temp.* ${hemi}.25.${para}.* ${hemi}.50.${para}.* ${hemi}.75.${para}.* ${hemi}.temp1.${para}.*
+                done
             done
         done
-    done
+    fi
 done

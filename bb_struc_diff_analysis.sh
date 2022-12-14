@@ -1,10 +1,8 @@
 #!/usr/bin/bash
 WorkDir=/media/peng/data/02_MriDataSet/99_demo/15_ukbiobank/wang
 
-
 RawDir=$WorkDir/raw
 sublist=($(ls $RawDir))
-# sublist="con001"
 
 # 1. fsl analysis: TBSS and Xtract, and DKI,NODDI, and MAP recon
 for sub in ${sublist[@]};
@@ -50,18 +48,21 @@ do
     $BB_BIN_DIR/bb_diffusion_pipeline/bb_tbss/bb_tbss_DSI_metrics ${sub}
 done
 
-# 2. surface analysis
+# 2. TBSS for all subjects
+meas="DKI_MD DKI_FA DKI_AD DKI_RD DKI_MK DKI_AK DKI_RK DKI_MKT DKI_KFA ISOVF ICVF OD RTOP RTAP RTPP NORM MSD QIV NG NG_PER NG_PAR"
+$BB_BIN_DIR/bb_diffusion_pipeline/bb_tbss/bb_tbss_all_subjects "${RawDir[*]}" "${meas[*]}"
 
+# 3. surface analysis
 meas="DKI_MD DKI_FA DKI_AD DKI_RD DKI_MK DKI_AK DKI_RK DKI_MKT DKI_KFA ISOVF ICVF OD RTOP RTAP RTPP NORM MSD QIV NG NG_PER NG_PAR"
 hemis="lh rh"
 smoothing="5 10"
 
-# 2.1 recon_all
+# 3.1 recon_all
     $BB_BIN_DIR/bb_FS_pipeline/recon_all_parallel.sh $WorkDir
-# 2.2 projection all metrics to surface and roi analysis
+# 3.2 projection all metrics to surface and roi analysis
     $BB_BIN_DIR/bb_diffusion_pipeline/bb_DKI/surf_analysis_diff_metrics.sh \
     $WorkDir $meas $hemis $smoothing
-# 2.3 surface stats 
+# 3.3 surface stats 
     # should creat fsgd file and contrast file in FS_stats
     $BB_BIN_DIR/bb_diffusion_pipeline/bb_DKI/mris_preproc.sh \
     "${WorkDir[*]}" "${meas[*]}" "${hemis[*]}" "${smoothing[*]}"

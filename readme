@@ -1,4 +1,5 @@
-1. set dir in dcm2nii.sh
-2. cd data_dir
-3. python bb_pipeline_struct.py
-4. python bb_pipeline_diff.py
+1. the main function bb_struc_diff_analysis.sh
+2. cd WorkDir
+3. should setup big and small delta in reconstruction.py
+4. bb_struc_diff_analysis.sh
+5. should setup fsgd file in FS_stats and contrast file
