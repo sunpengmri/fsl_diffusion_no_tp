@@ -35,7 +35,7 @@ class Usage(Exception):
 def reconstruction_dki_map_noddi():     
 
     parser = MyParser(description='recon dki noddi maps based dipy and dmipy')
-    parser.add_argument('-s', dest='subject', type=str, nargs=1, help='subject name')
+    parser.add_argument('-s', dest='subject', type=str,nargs=1, help='subject name')
     parser.add_argument('-t', dest='workdir', type=str,nargs=1, help='workdir')
 
     argsa = parser.parse_args()
@@ -52,11 +52,6 @@ def reconstruction_dki_map_noddi():
     subject=argsa.subject[0]
     workingdir=argsa.workdir[0]
 
-    # workingdir="/media/peng/data/02_MriDataSet/99_demo/15_ukbiobank/wang/con001/dMRI/dMRI"
-    # fraw="/media/peng/data/02_MriDataSet/99_demo/15_ukbiobank/wang/con001/dMRI/dMRI/data.nii.gz"
-    # fbval="/media/peng/data/02_MriDataSet/99_demo/15_ukbiobank/wang/con001/dMRI/dMRI/bvals"
-    # fbvec="/media/peng/data/02_MriDataSet/99_demo/15_ukbiobank/wang/con001/dMRI/dMRI/bvecs"
-    # fmask="/media/peng/data/02_MriDataSet/99_demo/15_ukbiobank/wang/con001/dMRI/dMRI/nodif_brain_mask.nii.gz"
     fraw=workingdir + '/' + subject + '/dMRI/dMRI/data.nii.gz'
     fbval=workingdir + '/' + subject + '/dMRI/dMRI/bvals'
     fbvec=workingdir + '/' + subject + '/dMRI/dMRI/bvecs'

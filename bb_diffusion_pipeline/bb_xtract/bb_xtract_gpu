@@ -40,4 +40,7 @@ fi
     -meas $meas \
     -r ${subjdir}/dti_FA.nii.gz
 # done
+
+# xtract_viewer  -dir dMRI.xtract/ -species HUMAN -str slf1_r
+
 . $BB_BIN_DIR/bb_pipeline_tools/bb_set_footer

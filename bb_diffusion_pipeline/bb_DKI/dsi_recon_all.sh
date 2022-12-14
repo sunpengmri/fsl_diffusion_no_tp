@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
 
-WorkDir=/home/dell/data/project1
-RawDir=$WorkDir/sub_hc
+WorkDir=/media/peng/data/02_MriDataSet/99_demo/15_ukbiobank/wang
+RawDir=$WorkDir/raw
 
 sublist=($(ls ${RawDir}))
 cd $RawDir

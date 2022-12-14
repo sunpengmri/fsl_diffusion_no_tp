@@ -11,19 +11,32 @@
 
 . "$BB_BIN_DIR"/bb_pipeline_tools/bb_set_header 
 
+# sublist="con001"
 direc="$PWD"
 cd $direc
-TBSSDir="$direc"/../TBSS
-mkdir "$TBSSDir"
-metrics="MD"
+TBSSDir="$direc"/TBSS
+meas="DKI_MD DKI_FA DKI_AD DKI_RD DKI_MK DKI_AK DKI_RK DKI_MKT DKI_KFA ISOVF ICVF OD RTOP RTAP RTPP NORM MSD QIV NG NG_PER NG_PAR"
+meas="DKI_MK DKI_MKT DKI_KFA ISOVF RTOP MSD QIV NG"
+meas="DKI_MK"
 
 
-WorkingDir=$direc
+# MD DKI_MK 
+if [ ! -d $TBSSDir ] ; then
+    mkdir "$TBSSDir"
+fi
+
+WorkingDir=$direc/sub_hc
 sublist=($(ls $WorkingDir))
-
 for sub in ${sublist[@]};  
 do   
-cp $direc/$sub/dMRI/dMRI/dti_FA.nii.gz "$TBSSDir"/${sub}_FA.nii.gz
+cp $WorkingDir/$sub/dMRI/dMRI/dti_FA.nii.gz "$TBSSDir"/hc_${sub}.nii.gz
+done 
+
+WorkingDir=$direc/sub_mci
+sublist=($(ls $WorkingDir))
+for sub in ${sublist[@]};  
+do   
+cp $WorkingDir/$sub/dMRI/dMRI/dti_FA.nii.gz "$TBSSDir"/mci_${sub}.nii.gz
 done 
 
 cd "$TBSSDir"
@@ -33,14 +46,14 @@ tbss_3_postreg -S
 tbss_4_prestats 0.2
 
 cd stats
-design_ttest2 tbss 3 3
-randomise -i all_FA_skeletonised -o FA_tbss -m mean_FA_skeleton_mask -d tbss.mat \
+design_ttest2 tbss 10 10
+randomise -i all_FA_skeletonised -o tbss -m mean_FA_skeleton_mask -d tbss.mat \
 -t tbss.con -n 5000 --T2
 
 # # show results
 # fsleyes $FSLDIR/data/standard/MNI152_T1_1mm mean_FA_skeleton -cm Green -dr 0.2 0.7 \
-# tbss_tfce_corrp_tstat1 -cm Red-Yellow -dr 0.8 1 \
-# tbss_tfce_corrp_tstat2 -cm Blue-Lightblue -dr 0.8 1
+# tbss_tfce_corrp_tstat1 -cm Red-Yellow -dr 0.7 1 \
+# tbss_tfce_corrp_tstat2 -cm Blue-Lightblue -dr 0.7 1
 
 
 # # thickens the threshold stats image
@@ -49,26 +62,34 @@ randomise -i all_FA_skeletonised -o FA_tbss -m mean_FA_skeleton_mask -d tbss.mat
 # tbss_fill95 -cm  Red-Yellow
 
 cd "$TBSSDir"
-
-for para in ${metrics}
+for para in ${meas}
 do
-    mkdir ${para}
-    WorkingDir=$direc
-    sublist=($(ls $WorkingDir))
-
-    for sub in ${sublist[@]};  
-    do   
-        cp $WorkingDir/$sub/dMRI/dMRI/dti_${para}.nii.gz "$TBSSDir"/${para}/${sub}_FA.nii.gz
-    done 
-
-    tbss_non_FA ${para}
-
     cd "$TBSSDir"
-    cd stats
-    design_ttest2 tbss 3 3
-    randomise -i all_${para}_skeletonised -o ${para}_tbss -m mean_FA_skeleton_mask -d tbss.mat \
-    -t tbss.con -n 5000 --T2
+    if [ ! -d ${para} ] ; then
+        mkdir "${para}"
 
+        WorkingDir=$direc/sub_hc
+        sublist=($(ls $WorkingDir))
+        for sub in ${sublist[@]};  
+        do   
+            cp $WorkingDir/$sub/dMRI/dMRI/dti_${para}.nii.gz "$TBSSDir"/${para}/hc_${sub}.nii.gz
+        done 
+
+        WorkingDir=$direc/sub_mci
+        sublist=($(ls $WorkingDir))
+        for sub in ${sublist[@]};  
+        do   
+            cp $WorkingDir/$sub/dMRI/dMRI/dti_${para}.nii.gz "$TBSSDir"/${para}/mci_${sub}.nii.gz
+        done 
+        tbss_non_FA ${para}
+        cd stats
+        randomise -i all_${para}_skeletonised -o ${para}_tbss -m mean_FA_skeleton -d tbss.mat -t tbss.con -n 5000 --T2
+    fi
 done
-
 . "$BB_BIN_DIR"/bb_pipeline_tools/bb_set_footer 
+
+
+# # show results
+# fsleyes $FSLDIR/data/standard/MNI152_T1_1mm mean_FA_skeleton -cm Green -dr 0.2 0.7 \
+# DKI_MK_tbss_tfce_corrp_tstat1 -cm Red-Yellow -dr 0.5 1 \
+# DKI_MK_tbss_tfce_corrp_tstat2 -cm Blue-Lightblue -dr 0.5 1
