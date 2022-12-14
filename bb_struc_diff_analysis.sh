@@ -64,11 +64,11 @@ smoothing="5 10"
 # 2.3 surface stats 
     # should creat fsgd file and contrast file in FS_stats
     $BB_BIN_DIR/bb_diffusion_pipeline/bb_DKI/mris_preproc.sh \
-    $WorkDir $meas $hemis $smoothing
+    "${WorkDir[*]}" "${meas[*]}" "${hemis[*]}" "${smoothing[*]}"
 
     $BB_BIN_DIR/bb_diffusion_pipeline/bb_DKI/mris_glm.sh \
-    $WorkDir $meas $hemis $smoothing
+    "${WorkDir[*]}" "${meas[*]}" "${hemis[*]}" "${smoothing[*]}"
 
     meas="ISOVF ICVF OD"
     $BB_BIN_DIR/bb_diffusion_pipeline/bb_DKI/mris_glm-sim.sh \
-    $WorkDir $meas $hemis $smoothing
+    "${WorkDir[*]}" "${meas[*]}" "${hemis[*]}" "${smoothing[*]}"

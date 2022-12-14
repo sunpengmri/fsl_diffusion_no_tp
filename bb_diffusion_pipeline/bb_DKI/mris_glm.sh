@@ -24,7 +24,7 @@ do
             --C $FsStatsDir/HC-MCI.mtx \
             --surf fsaverage $hemi  \
             --cortex  --eres-save \
-            --glmdir $FsStatsDir/$hemi.$meas.$smooth.glmdir
+            --glmdir $FsStatsDir/$hemi.$para.$smooth.glmdir
         done
     done
 done

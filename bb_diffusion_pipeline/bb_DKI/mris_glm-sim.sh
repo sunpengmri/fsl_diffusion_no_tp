@@ -20,7 +20,7 @@ do
         for smooth in ${smoothing}
         do
             mri_glmfit-sim \
-            --glmdir $FsStatsDir/$hemi.$meas.$smooth.glmdir \
+            --glmdir $FsStatsDir/$hemi.$para.$smooth.glmdir \
             --perm 1000 3.0 pos \
             # --a2009s \
             --cwp 0.05  \
