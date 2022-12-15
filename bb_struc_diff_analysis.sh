@@ -29,12 +29,12 @@ do
     cd ${RawDir}
     # 1.2 structure pipeline
     if [ ! -d  ${RawDir}/${sub}/T1/T1_vbm ]; then
-        python '/media/peng/data/00_github/00_MR_Analysis/01_FSL/11_ukbiobank/fsl_diffusion_no_tp/bb_structural_pipeline/bb_pipeline_struct.py' \
+        python $BB_BIN_DIR/bb_structural_pipeline/bb_pipeline_struct.py \
         -s ${sub}
     fi
     # 1.3 diffusion pipeline
     if [ ! -d  ${RawDir}/${sub}/dMRI/dMRI.xtract ]; then
-        python '/media/peng/data/00_github/00_MR_Analysis/01_FSL/11_ukbiobank/fsl_diffusion_no_tp/bb_diffusion_pipeline/bb_pipeline_diff.py' \
+        python $BB_BIN_DIR/bb_diffusion_pipeline/bb_pipeline_diff.py \
         -s ${sub}
     fi
     # 1.4 recon DKI, MAP, NODDI
