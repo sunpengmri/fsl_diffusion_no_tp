@@ -10,7 +10,7 @@ for sub in ${sublist[@]};
 do   
 #   1.1 raw data tranformation
     cd ${RawDir}/${sub}
-    if [ ! -d  ${RawDir}/${sub}/dMRI ]; then
+    if [ ! -f  ${RawDir}/${sub}/dMRI/raw/AP.nii.gz ]; then
         mkdir T1
         mkdir dMRI 
         mkdir dMRI/raw
